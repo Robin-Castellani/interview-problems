@@ -49,7 +49,9 @@ jobs:
           ls -a
           # first copy all the files in the gh-pages branch folder, also files beginning with .
           shopt -s dotglob
-          rm -r gh-pages/*
+          cd gh-pages
+          ls | grep -v .git | xargs rm -r
+          cd ..
           rm -rf master/.git
           cp -r master/* gh-pages
           # move into the docs folder in the gh-pages branch
