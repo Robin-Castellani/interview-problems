@@ -1,0 +1,95 @@
+name: Build docs with Sphinx on push
+
+# Controls when the action will run. Triggers the workflow on push event
+on:
+  - push
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "docs"
+  docs:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-18.04
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+
+      # Install Python
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      # Install the requirements, if present, and sphinx
+      - name: Install Python dependencies
+        run: |
+          if test -f requirements.txt; then
+            pip install -r requirements.txt
+          fi
+          pip install sphinx==3.2.1
+
+      # Build the documentation in the standard folders
+      - name: Build docs
+        run: |
+          mkdir docs
+          cd docs
+          # extract the account name and repository name
+          IFS='/' read -ra account_repo <<< "$GITHUB_REPOSITORY"
+          account=${account_repo[0]}
+          repo=${account_repo[1]}
+          echo "account_owner: $account"
+          echo "repository: $repo"
+          repo=$(echo "$repo" | tr '[:upper:]' '[:lower:]')
+          echo ::set-env name=REPO_NAME::$repo
+          # initialise the folders for the apidoc (import all modules, create docs folder and .rst files)
+          sphinx-apidoc --no-toc --module-first --extensions sphinx.ext.githubpages --full --doc-project $repo --doc-author $account -a -o . ..
+          # personalise the configuration
+          #  change the html theme
+          sed -i -e 's/alabaster/agogo/' conf.py
+          # add the README.rst located at the root of the repo into the documentation, if the file is present
+          if test -f ../README.rst; then
+            ln -s ../README.rst  # create symbolic link into the docs folder
+            sed -i '13i\ \ \ README' index.rst
+          fi
+          # create the documentation (treat the warnings as errors)
+          make html SPHINXOPTS="-W"
+
+      # Upload the generated HTML documentation
+      # In this way it will be available as Action's artifact for 90 days
+      # To regenerate an artifact open an already run Action and click "Re-run jobs" on the upper right
+      - name: Upload docs
+        uses: actions/upload-artifact@v2
+        with:
+          name: DocumentationHTML
+          path: docs/_build/html/
+          if-no-files-found: error
+
+      # commit on gh-pages branch the newly created documentation to be served
+      - name: Docs branch
+        run: |
+          # remove all files and folders but _build, where the website is
+          cd docs
+          ls | grep -v _build | xargs rm -r
+          # move the website data into docs, also files beginning with .
+          shopt -s dotglob
+          mv _build/html/* .
+          rm -r _build
+          # commit the new documentation and push
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHubActions"
+          git checkout gh-pages
+          git add --all
+          git commit -m 'Add documentation'
+          git push origin gh-pages
+
+      # Perform a health check: does the website return code 200?
+      - name: Health check the documentation website
+        run: |
+          # get the status code
+          code=$(curl -I "https://robin-castellani.github.io/${{ env.REPO_NAME }}" 2>&1 | awk '/HTTP\// {print $2}')
+          # perform the check
+          if [ "$code" == "200" ]; then echo "ok"; else echo "url https://robin-castellani.github.io/${{ env.REPO_NAME }}"; echo "code $code"; exit 1; fi
+
