@@ -16,14 +16,14 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out the master branch, so your job can access it
-      - name: Checkout the repo
+      - name: Checkout the master branch
         uses: actions/checkout@v2
         with:
           ref: 'master'
           path: 'master'
 
       # Checks-out the gh-pages branch
-      - name: Checkout the repo
+      - name: Checkout the gh-pages branch
         uses: actions/checkout@v2
         with:
           ref: 'gh-pages'
@@ -50,7 +50,8 @@ jobs:
           # first copy all the files in the gh-pages branch folder, also files beginning with .
           shopt -s dotglob
           rm -r gh-pages/*
-          cp master/* gh-pages
+          rm -rf master/.git
+          cp -r master/* gh-pages
           # move into the docs folder in the gh-pages branch
           cd gh-pages
           mkdir docs
