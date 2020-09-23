@@ -15,9 +15,19 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # Checks-out the master branch, so your job can access it
       - name: Checkout the repo
         uses: actions/checkout@v2
+          with:
+            ref: 'master'
+            path: 'master'
+
+      # Checks-out the gh-pages branch
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+        with:
+          ref: 'gh-pages'
+          path: 'gh-pages'
 
       # Install Python
       - name: Install Python
@@ -33,9 +43,16 @@ jobs:
           fi
           pip install sphinx==3.2.1
 
-      # Build the documentation in the standard folders
+      # Build the documentation in the gh-pages branch
       - name: Build docs
         run: |
+          ls -a
+          # first copy all the files in the gh-pages branch folder, also files beginning with .
+          shopt -s dotglob
+          rm -r gh-pages/*
+          cp master/* gh-pages
+          # move into the docs folder in the gh-pages branch
+          cd gh-pages
           mkdir docs
           cd docs
           # extract the account name and repository name
@@ -73,7 +90,7 @@ jobs:
       - name: Docs branch
         run: |
           # remove all files and folders but _build, where the website is
-          cd docs
+          cd gh-pages/docs
           ls | grep -v _build | xargs rm -r
           # move the website data into docs, also files beginning with .
           shopt -s dotglob
@@ -82,10 +99,9 @@ jobs:
           # commit the new documentation and push
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHubActions"
-          git checkout gh-pages
           git add --all
           git commit -m 'Add documentation'
-          #git push origin gh-pages
+          git push
 
       # Perform a health check: does the website return code 200?
       - name: Health check the documentation website
