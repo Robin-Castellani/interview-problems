@@ -1,0 +1,7 @@
+1\_integer\_sum module
+======================
+
+.. automodule:: 1_integer_sum
+   :members:
+   :undoc-members:
+   :show-inheritance:
