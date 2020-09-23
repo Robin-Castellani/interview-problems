@@ -83,7 +83,7 @@ jobs:
           git checkout gh-pages
           git add --all
           git commit -m 'Add documentation'
-          git push origin gh-pages
+          #git push origin gh-pages
 
       # Perform a health check: does the website return code 200?
       - name: Health check the documentation website
