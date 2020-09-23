@@ -84,7 +84,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: DocumentationHTML
-          path: docs/_build/html/
+          path: gh-pages/docs/_build/html/
           if-no-files-found: error
 
       # commit on gh-pages branch the newly created documentation to be served
