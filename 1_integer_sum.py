@@ -1,5 +1,6 @@
 """
 Sum of Integers Up To n
+========================
 
 Write a function, ``add_it_up()``, that takes a single positive
 integer as input and returns the sum of the integers from zero

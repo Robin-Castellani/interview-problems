@@ -1,9 +1,10 @@
 """
 Caesar Cipher
+==============
 
-A Caesar cipher is a simple substitution cipher in which each letter of the
-plain text is substituted with a letter found by moving ``n`` places down the
-alphabet.
+A Caesar cipher is a simple substitution cipher in which each letter
+of the plain text is substituted with a letter found by moving
+``n`` places down the alphabet.
 
 For example, assume the input plain text is the following::
 
@@ -19,10 +20,10 @@ message and a number of letters to shift in the cipher. The function will
 return an encrypted string with all letters transformed and all
 punctuation and whitespace remaining unchanged.
 
-..note::
-
+.. note::
   You can assume the plain text is all lowercase ASCII except for
   whitespace and punctuation.
+
 """
 
 import string
@@ -32,10 +33,10 @@ import time
 
 def timer(func):
     """
-    Simple decorator to print how much time a function requires
-    to run.
+    Simple decorator to print how many microseconds
+    a function requires to run.
     """
-    @functools.wraps(func)
+    @functools.wraps(func)  # preserves the original function name
     def wrapper_timer(*args, **kwargs):
         tic = time.perf_counter()
         value = func(*args, **kwargs)
@@ -54,8 +55,11 @@ def cipher_caesar(text: str, n: int) -> str:
     method: shift the letters of ``n`` position.
 
     :param text: string to be decrypted or encrypted.
+    :type text: str
     :param n: number of position to shift the letters.
+    :type n: int
     :return: decrypted/encrypted string.
+    :rtype: int
     """
 
     # get the total number of lowercase letters
@@ -89,8 +93,11 @@ def cipher_caesar_v2(text: str, n: int) -> str:
     method: shift the letters of ``n`` position.
 
     :param text: string to be decrypted or encrypted.
+    :type text: str
     :param n: number of position to shift the letters.
+    :type n: int
     :return: decrypted/encrypted string.
+    :rtype: int
     """
 
     # get the total number of lowercase letters
@@ -121,8 +128,11 @@ def cipher_caesar_v3(text: str, n: int) -> str:
     method: shift the letters of ``n`` position.
 
     :param text: string to be decrypted or encrypted.
+    :type text: str
     :param n: number of position to shift the letters.
+    :type n: int
     :return: decrypted/encrypted string.
+    :rtype: int
     """
 
     # create a conversion table only for ascii letters

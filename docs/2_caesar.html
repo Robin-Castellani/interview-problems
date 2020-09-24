@@ -42,10 +42,11 @@
             
   <div class="section" id="module-2_caesar">
 <span id="caesar-module"></span><h1>2_caesar module<a class="headerlink" href="#module-2_caesar" title="Permalink to this headline">¶</a></h1>
-<p>Caesar Cipher</p>
-<p>A Caesar cipher is a simple substitution cipher in which each letter of the
-plain text is substituted with a letter found by moving <code class="docutils literal notranslate"><span class="pre">n</span></code> places down the
-alphabet.</p>
+<div class="section" id="caesar-cipher">
+<h2>Caesar Cipher<a class="headerlink" href="#caesar-cipher" title="Permalink to this headline">¶</a></h2>
+<p>A Caesar cipher is a simple substitution cipher in which each letter
+of the plain text is substituted with a letter found by moving
+<code class="docutils literal notranslate"><span class="pre">n</span></code> places down the alphabet.</p>
 <p>For example, assume the input plain text is the following:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">abcd</span> <span class="n">xyz</span>
 </pre></div>
@@ -59,10 +60,10 @@ then the encrypted text would be the following:</p>
 message and a number of letters to shift in the cipher. The function will
 return an encrypted string with all letters transformed and all
 punctuation and whitespace remaining unchanged.</p>
-<p>..note:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">You</span> <span class="n">can</span> <span class="n">assume</span> <span class="n">the</span> <span class="n">plain</span> <span class="n">text</span> <span class="ow">is</span> <span class="nb">all</span> <span class="n">lowercase</span> <span class="n">ASCII</span> <span class="k">except</span> <span class="k">for</span>
-<span class="n">whitespace</span> <span class="ow">and</span> <span class="n">punctuation</span><span class="o">.</span>
-</pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can assume the plain text is all lowercase ASCII except for
+whitespace and punctuation.</p>
 </div>
 <dl class="py function">
 <dt id="caesar.cipher_caesar">
@@ -73,12 +74,15 @@ method: shift the letters of <code class="docutils literal notranslate"><span cl
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>text</strong> – string to be decrypted or encrypted.</p></li>
-<li><p><strong>n</strong> – number of position to shift the letters.</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – string to be decrypted or encrypted.</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – number of position to shift the letters.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>decrypted/encrypted string.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
 </dd>
 </dl>
 </dd></dl>
@@ -94,12 +98,15 @@ method: shift the letters of <code class="docutils literal notranslate"><span cl
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>text</strong> – string to be decrypted or encrypted.</p></li>
-<li><p><strong>n</strong> – number of position to shift the letters.</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – string to be decrypted or encrypted.</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – number of position to shift the letters.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>decrypted/encrypted string.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
 </dd>
 </dl>
 </dd></dl>
@@ -116,12 +123,15 @@ method: shift the letters of <code class="docutils literal notranslate"><span cl
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>text</strong> – string to be decrypted or encrypted.</p></li>
-<li><p><strong>n</strong> – number of position to shift the letters.</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – string to be decrypted or encrypted.</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – number of position to shift the letters.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>decrypted/encrypted string.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
 </dd>
 </dl>
 </dd></dl>
@@ -129,10 +139,11 @@ method: shift the letters of <code class="docutils literal notranslate"><span cl
 <dl class="py function">
 <dt id="caesar.timer">
 <span id="2_caesar.timer"></span><code class="sig-prename descclassname">2_caesar.</code><code class="sig-name descname">timer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/2_caesar.html#timer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#caesar.timer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Simple decorator to print how much time a function requires
-to run.</p>
+<dd><p>Simple decorator to print how many microseconds
+a function requires to run.</p>
 </dd></dl>
 
+</div>
 </div>
 
 
@@ -148,7 +159,10 @@ to run.</p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="README.html">README: problems solved in Python 🐍</a></li>
 <li class="toctree-l1"><a class="reference internal" href="1_integer_sum.html">1_integer_sum module</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">2_caesar module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">2_caesar module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#caesar-cipher">Caesar Cipher</a></li>
+</ul>
+</li>
 </ul>
 
           <div role="search">

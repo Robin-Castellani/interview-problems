@@ -40,10 +40,11 @@
   <h1>Source code for 2_caesar</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Caesar Cipher</span>
+<span class="sd">==============</span>
 
-<span class="sd">A Caesar cipher is a simple substitution cipher in which each letter of the</span>
-<span class="sd">plain text is substituted with a letter found by moving ``n`` places down the</span>
-<span class="sd">alphabet.</span>
+<span class="sd">A Caesar cipher is a simple substitution cipher in which each letter</span>
+<span class="sd">of the plain text is substituted with a letter found by moving</span>
+<span class="sd">``n`` places down the alphabet.</span>
 
 <span class="sd">For example, assume the input plain text is the following::</span>
 
@@ -59,10 +60,10 @@
 <span class="sd">return an encrypted string with all letters transformed and all</span>
 <span class="sd">punctuation and whitespace remaining unchanged.</span>
 
-<span class="sd">..note::</span>
-
+<span class="sd">.. note::</span>
 <span class="sd">  You can assume the plain text is all lowercase ASCII except for</span>
 <span class="sd">  whitespace and punctuation.</span>
+
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">string</span>
@@ -72,10 +73,10 @@
 
 <div class="viewcode-block" id="timer"><a class="viewcode-back" href="../2_caesar.html#2_caesar.timer">[docs]</a><span class="k">def</span> <span class="nf">timer</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Simple decorator to print how much time a function requires</span>
-<span class="sd">    to run.</span>
+<span class="sd">    Simple decorator to print how many microseconds</span>
+<span class="sd">    a function requires to run.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>  <span class="c1"># preserves the original function name</span>
     <span class="k">def</span> <span class="nf">wrapper_timer</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -94,8 +95,11 @@
 <span class="sd">    method: shift the letters of ``n`` position.</span>
 
 <span class="sd">    :param text: string to be decrypted or encrypted.</span>
+<span class="sd">    :type text: str</span>
 <span class="sd">    :param n: number of position to shift the letters.</span>
+<span class="sd">    :type n: int</span>
 <span class="sd">    :return: decrypted/encrypted string.</span>
+<span class="sd">    :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># get the total number of lowercase letters</span>
@@ -129,8 +133,11 @@
 <span class="sd">    method: shift the letters of ``n`` position.</span>
 
 <span class="sd">    :param text: string to be decrypted or encrypted.</span>
+<span class="sd">    :type text: str</span>
 <span class="sd">    :param n: number of position to shift the letters.</span>
+<span class="sd">    :type n: int</span>
 <span class="sd">    :return: decrypted/encrypted string.</span>
+<span class="sd">    :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># get the total number of lowercase letters</span>
@@ -161,8 +168,11 @@
 <span class="sd">    method: shift the letters of ``n`` position.</span>
 
 <span class="sd">    :param text: string to be decrypted or encrypted.</span>
+<span class="sd">    :type text: str</span>
 <span class="sd">    :param n: number of position to shift the letters.</span>
+<span class="sd">    :type n: int</span>
 <span class="sd">    :return: decrypted/encrypted string.</span>
+<span class="sd">    :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># create a conversion table only for ascii letters</span>
