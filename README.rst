@@ -48,6 +48,8 @@ otherwise returns zero.
 Encrypt or decrypt a string by shifting the letters of ``n`` positions
 in the alphabet; each non-letter character is preserved as it is.
 
+Three versions are available, increasingly faster and more readable.
+
 
 Contributions 🙏
 -------------------

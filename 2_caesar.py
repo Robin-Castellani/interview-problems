@@ -109,25 +109,59 @@ def cipher_caesar_v2(text: str, n: int) -> str:
     return encrypted_text
 
 
+@timer
+def cipher_caesar_v3(text: str, n: int) -> str:
+    """
+    Second version of the using ``str``'s ``translate`` function.
+    Even more concise, slower on single characters but definitely
+    faster than V2 on long strings.
+
+    Encrypt or decrypt the letters in a string preserving all non
+    letters characters (such as punctuation) according to the Caesar
+    method: shift the letters of ``n`` position.
+
+    :param text: string to be decrypted or encrypted.
+    :param n: number of position to shift the letters.
+    :return: decrypted/encrypted string.
+    """
+
+    # create a conversion table only for ascii letters
+    conversion_table = text.maketrans(
+        string.ascii_lowercase,
+        string.ascii_lowercase[n:] + string.ascii_lowercase[:n]
+    )
+    # apply the conversion table to the input text
+    encrypted_text = text.translate(conversion_table)
+
+    return encrypted_text
+
+
 if __name__ == '__main__':
     for letter in string.ascii_lowercase:
         assert cipher_caesar(letter, 0) == letter
         assert cipher_caesar_v2(letter, 0) == letter
+        assert cipher_caesar_v3(letter, 0) == letter
 
     for dig in string.digits:
         assert cipher_caesar(dig, 10) == dig
         assert cipher_caesar_v2(dig, 10) == dig
+        assert cipher_caesar_v3(dig, 10) == dig
 
     for punct in string.punctuation:
         assert cipher_caesar(punct, 1) == punct
         assert cipher_caesar_v2(punct, 1) == punct
+        assert cipher_caesar_v3(punct, 1) == punct
 
     for whitespace in string.whitespace:
         assert cipher_caesar(whitespace, 7) == whitespace
         assert cipher_caesar_v2(whitespace, 7) == whitespace
+        assert cipher_caesar_v3(whitespace, 7) == whitespace
 
     assert cipher_caesar('rkgerzr nhgbzngvba vf njrfbzr!', 13) == \
            'extreme automation is awesome!'
 
     assert cipher_caesar_v2('rkgerzr nhgbzngvba vf njrfbzr!', 13) == \
+           'extreme automation is awesome!'
+
+    assert cipher_caesar_v3('rkgerzr nhgbzngvba vf njrfbzr!', 13) == \
            'extreme automation is awesome!'
