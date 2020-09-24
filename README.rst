@@ -50,6 +50,11 @@ in the alphabet; each non-letter character is preserved as it is.
 
 Three versions are available, increasingly faster and more readable.
 
+``3_logparse.py`` Parse a log and print a report
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Parse the ``test.log`` file looking for specific strings holding Device
+status (``ON``, ``OFF`` or ``ERR``); print a report with the total ``ON``
+time and the timestamps of ``ERR`` events.
 
 Contributions 🙏
 -------------------
@@ -60,6 +65,8 @@ please open an issue or a pull request, I'll be happy to discuss with you.
 
 Whole new solutions will be added to the existing ones; the author will
 be named in the docstring (no money, sorry).
+
+Also, if you have any other interesting problem, you're welcome to submit it!
 
 
 License 🔖
