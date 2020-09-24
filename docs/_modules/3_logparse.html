@@ -1,0 +1,261 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3_logparse &#8212; interview-problems  documentation</title>
+    <link rel="stylesheet" href="../_static/agogo.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../index.html">interview-problems  documentation</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for 3_logparse</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Log parser</span>
+<span class="sd">===========</span>
+
+<span class="sd">Accepts a filename on the command line.</span>
+<span class="sd">The file is a Linux-like log file from a system you are debugging.</span>
+<span class="sd">Mixed in among the various statements are messages indicating</span>
+<span class="sd">the state of the device. They look like this:</span>
+
+<span class="sd">    Jul 11 16:11:51:490 [139681125603136] dut: Device State: ON</span>
+
+<span class="sd">The device state message has many possible values, but this program cares</span>
+<span class="sd">about only three: ``ON``, ``OFF``, and ``ERR``.</span>
+
+<span class="sd">Your program will parse the given log file and print out</span>
+<span class="sd">a report giving how long the device was ``ON``</span>
+<span class="sd">and the timestamp of any ``ERR`` conditions.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+
+
+<div class="viewcode-block" id="cli_parse"><a class="viewcode-back" href="../3_logparse.html#3_logparse.cli_parse">[docs]</a><span class="k">def</span> <span class="nf">cli_parse</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    CLI interface to get the logfile path with the ``--log`` argument.</span>
+
+<span class="sd">    :return: path of the logfile.</span>
+<span class="sd">    :rtype: pathlib.Path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;--log&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Path of the logfile to parse&#39;</span>
+    <span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">log</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="filter_log"><a class="viewcode-back" href="../3_logparse.html#3_logparse.filter_log">[docs]</a><span class="k">def</span> <span class="nf">filter_log</span><span class="p">(</span>
+        <span class="n">log</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read the logfile and get the timestamp and the status of log</span>
+<span class="sd">    messages reporting the Device status.</span>
+
+<span class="sd">    :param log: file path of the logfile.</span>
+<span class="sd">    :type log: pathlib.Path</span>
+<span class="sd">    :return: list of tuples with timestamp and status.</span>
+<span class="sd">    :rtype: typing.List[typing.Tuple[datetime.datetime, str]]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">filtered_log</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;Device State&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">line_elements</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="c1"># get the status</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="n">line_elements</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="c1"># get the time</span>
+                <span class="n">timestamp</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">line_elements</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+                <span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
+                    <span class="n">timestamp</span><span class="p">,</span> <span class="s1">&#39;%b </span><span class="si">%d</span><span class="s1"> %H:%M:%S:</span><span class="si">%f</span><span class="s1">&#39;</span>
+                <span class="p">)</span>
+
+                <span class="n">filtered_log</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">status</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">filtered_log</span></div>
+
+
+<div class="viewcode-block" id="compute_uptime"><a class="viewcode-back" href="../3_logparse.html#3_logparse.compute_uptime">[docs]</a><span class="k">def</span> <span class="nf">compute_uptime</span><span class="p">(</span>
+    <span class="n">filtered_log</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the total uptime in seconds</span>
+<span class="sd">    between each ``ON`` and ``OFF`` status.</span>
+
+<span class="sd">    :param filtered_log: list of tuples with timestamp and status.</span>
+<span class="sd">    :type filtered_log: typing.List[typing.Tuple[datetime.datetime, str]]</span>
+<span class="sd">    :return: seconds of uptime.</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># total seconds passed between as ON status and an OFF status</span>
+    <span class="n">uptime_seconds</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="c1"># I assume the first timestamp has an ON status</span>
+    <span class="c1"># as it can&#39;t be OFF or err if the Device wasn&#39;t ON first</span>
+    <span class="n">first_timestamp</span> <span class="o">=</span> <span class="n">filtered_log</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">on_timestamp</span> <span class="o">=</span> <span class="n">first_timestamp</span>
+    <span class="k">for</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">status</span> <span class="ow">in</span> <span class="n">filtered_log</span><span class="p">:</span>
+        <span class="c1"># get the timestamp when the Device is ON</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="s1">&#39;ON&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">timestamp</span> <span class="o">!=</span> <span class="n">first_timestamp</span><span class="p">:</span>
+                <span class="n">on_timestamp</span> <span class="o">=</span> <span class="n">timestamp</span>
+
+        <span class="c1"># when the Device is OFF, update the total uptime seconds</span>
+        <span class="k">elif</span> <span class="n">status</span> <span class="o">==</span> <span class="s1">&#39;OFF&#39;</span><span class="p">:</span>
+            <span class="n">off_timestamp</span> <span class="o">=</span> <span class="n">timestamp</span>
+            <span class="n">uptime_seconds</span> <span class="o">+=</span> <span class="p">(</span><span class="n">off_timestamp</span> <span class="o">-</span> <span class="n">on_timestamp</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">uptime_seconds</span></div>
+
+
+<div class="viewcode-block" id="check_errors"><a class="viewcode-back" href="../3_logparse.html#3_logparse.check_errors">[docs]</a><span class="k">def</span> <span class="nf">check_errors</span><span class="p">(</span>
+    <span class="n">filtered_log</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the timestamps associated with the status ``ERR``.</span>
+
+<span class="sd">    :param filtered_log: list of tuples with timestamp and status.</span>
+<span class="sd">    :type filtered_log: typing.List[typing.Tuple[datetime.datetime, str]]</span>
+<span class="sd">    :return: list of timestamps formatted to nice strings.</span>
+<span class="sd">    :rtype: typing.List[str]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># list to store timestamps associated with error events</span>
+    <span class="n">error_events</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">timestamp</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%b </span><span class="si">%d</span><span class="s1"> %H:%M:%S:</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">status</span> <span class="ow">in</span> <span class="n">filtered_log</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="s1">&#39;ERR&#39;</span>
+    <span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">error_events</span></div>
+
+
+<div class="viewcode-block" id="prepare_report"><a class="viewcode-back" href="../3_logparse.html#3_logparse.prepare_report">[docs]</a><span class="k">def</span> <span class="nf">prepare_report</span><span class="p">(</span>
+        <span class="n">filtered_log</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a string holding the report data.</span>
+
+<span class="sd">    :param filtered_log: list of tuples with timestamp and status.</span>
+<span class="sd">    :type filtered_log: typing.List[typing.Tuple[datetime.datetime, str]]</span>
+<span class="sd">    :return: report data.</span>
+<span class="sd">    :rtype: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">uptime_seconds</span> <span class="o">=</span> <span class="n">compute_uptime</span><span class="p">(</span><span class="n">filtered_log</span><span class="p">)</span>
+
+    <span class="n">error_events</span> <span class="o">=</span> <span class="n">check_errors</span><span class="p">(</span><span class="n">filtered_log</span><span class="p">)</span>
+
+    <span class="c1"># create the report</span>
+    <span class="n">report</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;⏱ Total uptime seconds: </span><span class="si">{</span><span class="n">uptime_seconds</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">s&#39;</span>
+    <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">--------</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">error_events</span><span class="p">:</span>
+        <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;🎉 No error events, hurray 🎉&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;⚠ Error events at:&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">error_events</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">report</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="n">log_to_parse</span> <span class="o">=</span> <span class="n">cli_parse</span><span class="p">()</span>
+
+    <span class="n">log_timestamps</span> <span class="o">=</span> <span class="n">filter_log</span><span class="p">(</span><span class="n">log_to_parse</span><span class="p">)</span>
+
+    <span class="n">log_report</span> <span class="o">=</span> <span class="n">prepare_report</span><span class="p">(</span><span class="n">log_timestamps</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">log_report</span><span class="p">)</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">README: problems solved in Python 🐍</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../1_integer_sum.html">1_integer_sum module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../2_caesar.html">2_caesar module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3_logparse.html">3_logparse module</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Search</h3>
+            <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="Go" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="../py-modindex.html" title="Python Module Index"
+              >modules</a> |
+            <a href="../genindex.html" title="General Index"
+              >index</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Robin-Castellani.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

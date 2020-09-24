@@ -1,0 +1,209 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3_logparse module &#8212; interview-problems  documentation</title>
+    <link rel="stylesheet" href="_static/agogo.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="2_caesar module" href="2_caesar.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="index.html">interview-problems  documentation</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="2_caesar.html" title="2_caesar module"
+             accesskey="P">previous</a> |
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-3_logparse">
+<span id="logparse-module"></span><h1>3_logparse module<a class="headerlink" href="#module-3_logparse" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="log-parser">
+<h2>Log parser<a class="headerlink" href="#log-parser" title="Permalink to this headline">¶</a></h2>
+<p>Accepts a filename on the command line.
+The file is a Linux-like log file from a system you are debugging.
+Mixed in among the various statements are messages indicating
+the state of the device. They look like this:</p>
+<blockquote>
+<div><p>Jul 11 16:11:51:490 [139681125603136] dut: Device State: ON</p>
+</div></blockquote>
+<p>The device state message has many possible values, but this program cares
+about only three: <code class="docutils literal notranslate"><span class="pre">ON</span></code>, <code class="docutils literal notranslate"><span class="pre">OFF</span></code>, and <code class="docutils literal notranslate"><span class="pre">ERR</span></code>.</p>
+<p>Your program will parse the given log file and print out
+a report giving how long the device was <code class="docutils literal notranslate"><span class="pre">ON</span></code>
+and the timestamp of any <code class="docutils literal notranslate"><span class="pre">ERR</span></code> conditions.</p>
+<dl class="py function">
+<dt id="logparse.check_errors">
+<span id="3_logparse.check_errors"></span><code class="sig-prename descclassname">3_logparse.</code><code class="sig-name descname">check_errors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filtered_log</span><span class="p">:</span> <span class="n">List<span class="p">[</span>Tuple<span class="p">[</span>datetime.datetime<span class="p">, </span>str<span class="p">]</span><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>str<span class="p">]</span><a class="reference internal" href="_modules/3_logparse.html#check_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logparse.check_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the timestamps associated with the status <code class="docutils literal notranslate"><span class="pre">ERR</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filtered_log</strong> (<em>typing.List</em><em>[</em><em>typing.Tuple</em><em>[</em><em>datetime.datetime</em><em>, </em><em>str</em><em>]</em><em>]</em>) – list of tuples with timestamp and status.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of timestamps formatted to nice strings.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>typing.List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="logparse.cli_parse">
+<span id="3_logparse.cli_parse"></span><code class="sig-prename descclassname">3_logparse.</code><code class="sig-name descname">cli_parse</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pathlib.Path<a class="reference internal" href="_modules/3_logparse.html#cli_parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logparse.cli_parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>CLI interface to get the logfile path with the <code class="docutils literal notranslate"><span class="pre">--log</span></code> argument.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>path of the logfile.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>pathlib.Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="logparse.compute_uptime">
+<span id="3_logparse.compute_uptime"></span><code class="sig-prename descclassname">3_logparse.</code><code class="sig-name descname">compute_uptime</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filtered_log</span><span class="p">:</span> <span class="n">List<span class="p">[</span>Tuple<span class="p">[</span>datetime.datetime<span class="p">, </span>str<span class="p">]</span><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/3_logparse.html#compute_uptime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logparse.compute_uptime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the total uptime in seconds
+between each <code class="docutils literal notranslate"><span class="pre">ON</span></code> and <code class="docutils literal notranslate"><span class="pre">OFF</span></code> status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filtered_log</strong> (<em>typing.List</em><em>[</em><em>typing.Tuple</em><em>[</em><em>datetime.datetime</em><em>, </em><em>str</em><em>]</em><em>]</em>) – list of tuples with timestamp and status.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>seconds of uptime.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="logparse.filter_log">
+<span id="3_logparse.filter_log"></span><code class="sig-prename descclassname">3_logparse.</code><code class="sig-name descname">filter_log</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">log</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>Tuple<span class="p">[</span>datetime.datetime<span class="p">, </span>str<span class="p">]</span><span class="p">]</span><a class="reference internal" href="_modules/3_logparse.html#filter_log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logparse.filter_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the logfile and get the timestamp and the status of log
+messages reporting the Device status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>log</strong> (<em>pathlib.Path</em>) – file path of the logfile.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of tuples with timestamp and status.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>typing.List[typing.Tuple[datetime.datetime, str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="logparse.prepare_report">
+<span id="3_logparse.prepare_report"></span><code class="sig-prename descclassname">3_logparse.</code><code class="sig-name descname">prepare_report</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filtered_log</span><span class="p">:</span> <span class="n">List<span class="p">[</span>Tuple<span class="p">[</span>datetime.datetime<span class="p">, </span>str<span class="p">]</span><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="_modules/3_logparse.html#prepare_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logparse.prepare_report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a string holding the report data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filtered_log</strong> (<em>typing.List</em><em>[</em><em>typing.Tuple</em><em>[</em><em>datetime.datetime</em><em>, </em><em>str</em><em>]</em><em>]</em>) – list of tuples with timestamp and status.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>report data.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="README.html">README: problems solved in Python 🐍</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1_integer_sum.html">1_integer_sum module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2_caesar.html">2_caesar module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">3_logparse module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#log-parser">Log parser</a></li>
+</ul>
+</li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Search</h3>
+            <form class="search" action="search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="Go" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="2_caesar.html" title="2_caesar module"
+              >previous</a> |
+            <a href="py-modindex.html" title="Python Module Index"
+              >modules</a> |
+            <a href="genindex.html" title="General Index"
+              >index</a>
+          </div>
+          <div role="note" aria-label="source link">
+              <br/>
+              <a href="_sources/3_logparse.rst.txt"
+                rel="nofollow">Show Source</a>
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Robin-Castellani.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>
