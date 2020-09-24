@@ -112,5 +112,12 @@ jobs:
           # get the status code
           code=$(curl -I "https://robin-castellani.github.io/${{ env.REPO_NAME }}" 2>&1 | awk '/HTTP\// {print $2}')
           # perform the check
-          if [ "$code" == "200" ]; then echo "ok"; else echo "url https://robin-castellani.github.io/${{ env.REPO_NAME }}"; echo "code $code"; exit 1; fi
+          if [ "$code" == "200" -o "$code" == "301" ]
+          then
+            echo "ok"
+          else
+            echo "url https://robin-castellani.github.io/${{ env.REPO_NAME }}"
+            echo "code $code"
+            exit 1
+          fi
 

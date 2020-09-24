@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2_caesar module &#8212; interview-problems  documentation</title>
+    <link rel="stylesheet" href="_static/agogo.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="1_integer_sum module" href="1_integer_sum.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="index.html">interview-problems  documentation</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="1_integer_sum.html" title="1_integer_sum module"
+             accesskey="P">previous</a> |
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-2_caesar">
+<span id="caesar-module"></span><h1>2_caesar module<a class="headerlink" href="#module-2_caesar" title="Permalink to this headline">¶</a></h1>
+<p>Caesar Cipher</p>
+<p>A Caesar cipher is a simple substitution cipher in which each letter of the
+plain text is substituted with a letter found by moving <code class="docutils literal notranslate"><span class="pre">n</span></code> places down the
+alphabet.</p>
+<p>For example, assume the input plain text is the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">abcd</span> <span class="n">xyz</span>
+</pre></div>
+</div>
+<p>If the shift value, <code class="docutils literal notranslate"><span class="pre">n</span></code>, is <code class="docutils literal notranslate"><span class="pre">4</span></code>,
+then the encrypted text would be the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">efgh</span> <span class="n">bcd</span>
+</pre></div>
+</div>
+<p>You are to write a function that accepts two arguments, a plain-text
+message and a number of letters to shift in the cipher. The function will
+return an encrypted string with all letters transformed and all
+punctuation and whitespace remaining unchanged.</p>
+<p>..note:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">You</span> <span class="n">can</span> <span class="n">assume</span> <span class="n">the</span> <span class="n">plain</span> <span class="n">text</span> <span class="ow">is</span> <span class="nb">all</span> <span class="n">lowercase</span> <span class="n">ASCII</span> <span class="k">except</span> <span class="k">for</span>
+<span class="n">whitespace</span> <span class="ow">and</span> <span class="n">punctuation</span><span class="o">.</span>
+</pre></div>
+</div>
+<dl class="py function">
+<dt id="caesar.cipher_caesar">
+<span id="2_caesar.cipher_caesar"></span><code class="sig-prename descclassname">2_caesar.</code><code class="sig-name descname">cipher_caesar</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">text</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">n</span><span class="p">:</span> <span class="n">int</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="_modules/2_caesar.html#cipher_caesar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#caesar.cipher_caesar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encrypt or decrypt the letters in a string preserving all non
+letters characters (such as punctuation) according to the Caesar
+method: shift the letters of <code class="docutils literal notranslate"><span class="pre">n</span></code> position.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> – string to be decrypted or encrypted.</p></li>
+<li><p><strong>n</strong> – number of position to shift the letters.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>decrypted/encrypted string.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="caesar.cipher_caesar_v2">
+<span id="2_caesar.cipher_caesar_v2"></span><code class="sig-prename descclassname">2_caesar.</code><code class="sig-name descname">cipher_caesar_v2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">text</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">n</span><span class="p">:</span> <span class="n">int</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="_modules/2_caesar.html#cipher_caesar_v2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#caesar.cipher_caesar_v2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Second version of the using list comprehension. More concise.
+Slower on single letters, faster on longer strings than V1.</p>
+<p>Encrypt or decrypt the letters in a string preserving all non
+letters characters (such as punctuation) according to the Caesar
+method: shift the letters of <code class="docutils literal notranslate"><span class="pre">n</span></code> position.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> – string to be decrypted or encrypted.</p></li>
+<li><p><strong>n</strong> – number of position to shift the letters.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>decrypted/encrypted string.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="caesar.cipher_caesar_v3">
+<span id="2_caesar.cipher_caesar_v3"></span><code class="sig-prename descclassname">2_caesar.</code><code class="sig-name descname">cipher_caesar_v3</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">text</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">n</span><span class="p">:</span> <span class="n">int</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="_modules/2_caesar.html#cipher_caesar_v3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#caesar.cipher_caesar_v3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Second version of the using <code class="docutils literal notranslate"><span class="pre">str</span></code>’s <code class="docutils literal notranslate"><span class="pre">translate</span></code> function.
+Even more concise, slower on single characters but definitely
+faster than V2 on long strings.</p>
+<p>Encrypt or decrypt the letters in a string preserving all non
+letters characters (such as punctuation) according to the Caesar
+method: shift the letters of <code class="docutils literal notranslate"><span class="pre">n</span></code> position.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> – string to be decrypted or encrypted.</p></li>
+<li><p><strong>n</strong> – number of position to shift the letters.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>decrypted/encrypted string.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="caesar.timer">
+<span id="2_caesar.timer"></span><code class="sig-prename descclassname">2_caesar.</code><code class="sig-name descname">timer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/2_caesar.html#timer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#caesar.timer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple decorator to print how much time a function requires
+to run.</p>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="README.html">README: problems solved in Python 🐍</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1_integer_sum.html">1_integer_sum module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">2_caesar module</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Search</h3>
+            <form class="search" action="search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="Go" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="1_integer_sum.html" title="1_integer_sum module"
+              >previous</a> |
+            <a href="py-modindex.html" title="Python Module Index"
+              >modules</a> |
+            <a href="genindex.html" title="General Index"
+              >index</a>
+          </div>
+          <div role="note" aria-label="source link">
+              <br/>
+              <a href="_sources/2_caesar.rst.txt"
+                rel="nofollow">Show Source</a>
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Robin-Castellani.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

@@ -22,6 +22,8 @@ I want to show you:
 - I know how to write documentation with the ReStructuredText syntax
   (which I think is harder than Markdown, but it makes me obtain wonderful
   results without using LaTeX);
+- I know how to use Sphinx and GitHub Actions to automatically build
+  beautiful and professional documentation from docstrings;
 - as you read, I speak (or better, I write) English.
 
 The problems 🤔
@@ -41,6 +43,13 @@ Single function which ingests a number; if it is a positive integer,
 return the sum of all positive integers from zero to that number included,
 otherwise returns zero.
 
+``2_caesar.py`` Encrypt or decrypt a string according to Caesar cipher
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Encrypt or decrypt a string by shifting the letters of ``n`` positions
+in the alphabet; each non-letter character is preserved as it is.
+
+Three versions are available, increasingly faster and more readable.
+
 
 Contributions 🙏
 -------------------
@@ -51,3 +60,12 @@ please open an issue or a pull request, I'll be happy to discuss with you.
 
 Whole new solutions will be added to the existing ones; the author will
 be named in the docstring (no money, sorry).
+
+
+License 🔖
+-------------
+
+All the material in this repo is available through the
+`Creative Commons Attribution-NonCommercial-ShareAlike
+4.0 International license
+<https://creativecommons.org/licenses/by-nc-sa/4.0/>`_.
