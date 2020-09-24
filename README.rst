@@ -51,3 +51,12 @@ please open an issue or a pull request, I'll be happy to discuss with you.
 
 Whole new solutions will be added to the existing ones; the author will
 be named in the docstring (no money, sorry).
+
+
+License 🔖
+-------------
+
+All the material in this repo is available through the
+`Creative Commons Attribution-NonCommercial-ShareAlike
+4.0 International license
+<https://creativecommons.org/licenses/by-nc-sa/4.0/>`_.
