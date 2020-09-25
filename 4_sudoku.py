@@ -49,6 +49,7 @@ The string represents this starting sudoku puzzle:
 import pathlib
 import typing
 import time
+import itertools
 
 import numpy as np
 
@@ -111,13 +112,14 @@ def solve_puzzle(sudoku_puzzle: np.ndarray) -> typing.Optional[np.ndarray]:
     if 0 not in sudoku_puzzle:
         return sudoku_puzzle
 
-    # dict to store the valid digits in each void cell
-    valid_digits = {
-        (row_n, col_n): []
-        for row_n in range(9)
+    # list of lists to store the valid digits in each cell
+    valid_digits = [
+        [
+            []
+            for row_n in range(9)
+        ]
         for col_n in range(9)
-        if sudoku_puzzle[row_n, col_n] == 0
-    }
+    ]
 
     # cycle over the cells
     for row_n in range(9):
@@ -140,13 +142,81 @@ def solve_puzzle(sudoku_puzzle: np.ndarray) -> typing.Optional[np.ndarray]:
                         n in sudoku_puzzle[:, col_n] or
                         n in sudoku_puzzle[region]
                 ):
-                    valid_digits[(row_n, col_n)].append(n)
+                    valid_digits[row_n][col_n].append(n)
 
             # does a single digit fit in the current cell?
             # update the puzzle and start the algorithm from scratch
-            if len(valid_digits[(row_n, col_n)]) == 1:
-                sudoku_puzzle[row_n, col_n] = valid_digits[(row_n, col_n)][0]
+            if len(valid_digits[row_n][col_n]) == 1:
+                sudoku_puzzle[row_n, col_n] = valid_digits[row_n][col_n][0]
 
+                return solve_puzzle(sudoku_puzzle)
+
+    # multiple digits fit in each void cell?
+    # check all the valid digits looking for a unique valid digit
+    # in a row, column or region
+    # if it is found, start the algorithm from scratch
+    valid_digits_array = np.array(valid_digits, dtype='object')
+
+    # check for single valid digits in rows
+    for row_n in range(9):
+        digits_to_check = set(
+            itertools.chain.from_iterable(
+                valid_digits_array[row_n, :].flatten()
+            )
+        )
+        for digit in digits_to_check:
+            digit_presence = [
+                digit in lst
+                for lst in valid_digits_array[row_n, :].flatten()
+            ]
+            if sum(digit_presence) == 1:
+                idx = digit_presence.index(True)
+                sudoku_puzzle[row_n, idx] = digit
+                return solve_puzzle(sudoku_puzzle)
+
+    # check for single valid digits in columns
+    for col_n in range(9):
+        digits_to_check = set(
+            itertools.chain.from_iterable(
+                valid_digits_array[:, col_n].flatten()
+            )
+        )
+        for digit in digits_to_check:
+            digit_presence = [
+                digit in lst
+                for lst in valid_digits_array[:, col_n].flatten()
+            ]
+            if sum(digit_presence) == 1:
+                idx = digit_presence.index(True)
+                sudoku_puzzle[idx, col_n] = digit
+                return solve_puzzle(sudoku_puzzle)
+
+    # create regions and check for single valid digits among them
+    regions = [
+        (
+            slice(row_n // 3 * 3, (row_n // 3 + 1) * 3),
+            slice(col_n // 3 * 3, (col_n // 3 + 1) * 3)
+        )
+        for row_n in range(0, 9, 3) for col_n in range(0, 9, 3)
+    ]
+    for region in regions:
+        digits_to_check = set(
+            itertools.chain.from_iterable(
+                valid_digits_array[region].flatten()
+            )
+        )
+        for digit in digits_to_check:
+            digit_presence = [
+                digit in lst
+                for lst in valid_digits_array[region].flatten()
+            ]
+            if sum(digit_presence) == 1:
+                # with regions, the idx is the progressive position
+                idx = digit_presence.index(True)
+                # convert idx to row and column number
+                target_row = idx // 3 + region[0].start
+                target_col = idx % 3 + region[1].start
+                sudoku_puzzle[target_row, target_col] = digit
                 return solve_puzzle(sudoku_puzzle)
 
     return None
