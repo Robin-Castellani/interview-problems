@@ -66,8 +66,9 @@ def puzzle_from_sdm(
     """
 
     with open(sdm_file, mode='r', encoding='utf-8') as f:
-        for i, sdm in enumerate(f):
-            assert len(sdm) == 81, f'Puzzle at line {i} is not valid'
+        for l, sdm in enumerate(f, 1):
+            sdm = sdm.rstrip()
+            assert len(sdm) == 81, f'Puzzle at line {l} is not valid'
             yield sdm
 
 
@@ -167,4 +168,3 @@ if __name__ == '__main__':
                 '-' * 30,
                 sep='\n'
             )
-
