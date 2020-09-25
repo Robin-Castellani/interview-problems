@@ -59,7 +59,11 @@ time and the timestamps of ``ERR`` events.
 ``4_sudoku.py`` Classical Sudoku solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Read puzzles from a ``.sdm`` file and reports the solutions, if
-they are unique.
+they can be solved with a unique solution.
+The solution is checked against the one computed with
+the ``py-sudoku`` library.
+
+At present, the algorithm can solve the easiest soduku.
 
 
 Contributions 🙏

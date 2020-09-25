@@ -54,6 +54,9 @@ import itertools
 import numpy as np
 from sudoku import sudoku
 
+# TODO: pretty print the sudoku
+# TODO: create a Sudoku class with read and write and solve methods
+
 
 def puzzle_from_sdm(
         sdm_file: pathlib.Path
@@ -95,11 +98,15 @@ def solve_puzzle(sudoku_puzzle: np.ndarray) -> typing.Optional[np.ndarray]:
     """
     Recursive function to solve te Sudoku.
 
-    For each cell, search all the valid digits. When a cell has
-    a unique valid digit, update the puzzle with that digit and recall
-    this function.
+    For each cell, search all the digits which could fit in it.
+    When a cell has a unique valid digit,
+    update the puzzle with that digit and recall this function.
 
     If no cell with a single digit is found across the whole Sudoku,
+    look for a unique digit among all the valid ones in each row,
+    column or region.
+
+    If no other digit is found,
     the puzzle may have multiple solutions and recursion stops.
 
     :param sudoku_puzzle: puzzle data.
@@ -225,7 +232,9 @@ def solve_puzzle(sudoku_puzzle: np.ndarray) -> typing.Optional[np.ndarray]:
 
 if __name__ == '__main__':
     # read the sdm file
-    for i, raw_puzzle in enumerate(puzzle_from_sdm('sudoku_puzzles.sdm'), 1):
+    for i, raw_puzzle in enumerate(
+            puzzle_from_sdm(pathlib.Path('./sudoku_puzzles.sdm')), 1
+    ):
         # convert string to array
         puzzle = sdm_to_array(raw_puzzle)
         # instantiate the same puzzle with the sudoku library (py-sudoku)
