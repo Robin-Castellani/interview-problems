@@ -52,6 +52,7 @@ import time
 import itertools
 
 import numpy as np
+from sudoku import sudoku
 
 
 def puzzle_from_sdm(
@@ -227,6 +228,9 @@ if __name__ == '__main__':
     for i, raw_puzzle in enumerate(puzzle_from_sdm('sudoku_puzzles.sdm'), 1):
         # convert string to array
         puzzle = sdm_to_array(raw_puzzle)
+        # instantiate the same puzzle with the sudoku library (py-sudoku)
+        # to check my result against it
+        comparison_puzzle = sudoku.Sudoku(3, 3, board=puzzle.tolist())
 
         # solve the puzzle timing it
         tic = time.perf_counter()
@@ -235,12 +239,16 @@ if __name__ == '__main__':
 
         # report the result
         if solution is None:
-            print(f'Puzzle {i}: No solution, "Unsolvable"')
-            print('-' * 30)
+            print(f'Puzzle {i}: I found no solution, "Unsolvable"')
+            print(comparison_puzzle.solve())
+
+            print('=' * 30)
         else:
+            # check my result with the comparison one
+            assert solution.tolist() == comparison_puzzle.solve().board
             print(
                 f'Puzzle {i}: solved in {toc - tic:.4f}s, the solution is',
                 solution,
-                '-' * 30,
+                '=' * 30,
                 sep='\n'
             )
