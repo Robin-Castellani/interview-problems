@@ -103,20 +103,23 @@ def solve_puzzle(sudoku_puzzle: np.ndarray) -> typing.Optional[np.ndarray]:
     :param sudoku_puzzle: puzzle data.
     :type sudoku_puzzle: np.ndarray
     :return: the puzzle updated with new digits until a solution is
-        found or None when multiple solutions are possible.
+        found or ``None`` when multiple solutions are possible.
     :rtype: typing.Optional[np.ndarray]
     """
 
+    # has the puzzle already been solved?
     if 0 not in sudoku_puzzle:
         return sudoku_puzzle
 
-    possible_values = {
+    # dict to store the valid digits in each void cell
+    valid_digits = {
         (row_n, col_n): []
         for row_n in range(9)
         for col_n in range(9)
         if sudoku_puzzle[row_n, col_n] == 0
     }
 
+    # cycle over the cells
     for row_n in range(9):
         for col_n in range(9):
             # skip the non-void cells
@@ -129,17 +132,20 @@ def solve_puzzle(sudoku_puzzle: np.ndarray) -> typing.Optional[np.ndarray]:
                 slice(col_n // 3 * 3, (col_n // 3 + 1) * 3)
             )
 
+            # check which digit could fit in the current cell
+            # -> the digit is not in the row or column or region
             for n in range(1, 10):
-                # the digit is not in the row or column or region
                 if not(
                         n in sudoku_puzzle[row_n, :] or
                         n in sudoku_puzzle[:, col_n] or
                         n in sudoku_puzzle[region]
                 ):
-                    possible_values[(row_n, col_n)].append(n)
+                    valid_digits[(row_n, col_n)].append(n)
 
-            if len(possible_values[(row_n, col_n)]) == 1:
-                sudoku_puzzle[row_n, col_n] = possible_values[(row_n, col_n)][0]
+            # does a single digit fit in the current cell?
+            # update the puzzle and start the algorithm from scratch
+            if len(valid_digits[(row_n, col_n)]) == 1:
+                sudoku_puzzle[row_n, col_n] = valid_digits[(row_n, col_n)][0]
 
                 return solve_puzzle(sudoku_puzzle)
 
