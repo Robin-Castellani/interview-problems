@@ -56,6 +56,12 @@ Parse the ``test.log`` file looking for specific strings holding Device
 status (``ON``, ``OFF`` or ``ERR``); print a report with the total ``ON``
 time and the timestamps of ``ERR`` events.
 
+``4_sudoku.py`` Classical Sudoku solver
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Read puzzles from a ``.sdm`` file and reports the solutions, if
+they are unique.
+
+
 Contributions 🙏
 -------------------
 
