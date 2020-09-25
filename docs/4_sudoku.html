@@ -1,0 +1,208 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4_sudoku module &#8212; interview-problems  documentation</title>
+    <link rel="stylesheet" href="_static/agogo.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="3_logparse module" href="3_logparse.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="index.html">interview-problems  documentation</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="3_logparse.html" title="3_logparse module"
+             accesskey="P">previous</a> |
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-4_sudoku">
+<span id="sudoku-module"></span><h1>4_sudoku module<a class="headerlink" href="#module-4_sudoku" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="sudoku-solver">
+<h2>Sudoku Solver<a class="headerlink" href="#sudoku-solver" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A description of the sudoku puzzle can be found at:
+<a class="reference external" href="https://en.wikipedia.org/wiki/Sudoku">https://en.wikipedia.org/wiki/Sudoku</a>.</p>
+</div>
+<p>Given a string in <code class="docutils literal notranslate"><span class="pre">SDM</span></code> format, described below,
+write a program to find and return the solution for the sudoku puzzle
+in the string.
+The solution should be returned in the same <code class="docutils literal notranslate"><span class="pre">SDM</span></code> format as the input.</p>
+<p>Some puzzles will not be solvable.
+In that case, return the string <code class="docutils literal notranslate"><span class="pre">&quot;Unsolvable&quot;</span></code>.</p>
+<p>The general <code class="docutils literal notranslate"><span class="pre">SDM</span></code> format is described here:
+<a class="reference external" href="http://www.sudocue.net/fileformats.php">http://www.sudocue.net/fileformats.php</a>.</p>
+<p>For our purposes, each <code class="docutils literal notranslate"><span class="pre">SDM</span></code> string will be a sequence of 81 digits,
+one for each position on the sudoku puzzle.
+Known numbers will be given, and unknown positions will have a zero value.</p>
+<p>For example, assume you’re given this string of digits:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">004006079000000602056092300078061030509000406020540890007410920105000000840600100</span>
+</pre></div>
+</div>
+<p>The string represents this starting sudoku puzzle:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">0</span> <span class="mi">0</span> <span class="mi">4</span>   <span class="mi">0</span> <span class="mi">0</span> <span class="mi">6</span>   <span class="mi">0</span> <span class="mi">7</span> <span class="mi">9</span>
+<span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span>   <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span>   <span class="mi">6</span> <span class="mi">0</span> <span class="mi">2</span>
+<span class="mi">0</span> <span class="mi">5</span> <span class="mi">6</span>   <span class="mi">0</span> <span class="mi">9</span> <span class="mi">2</span>   <span class="mi">3</span> <span class="mi">0</span> <span class="mi">0</span>
+
+<span class="mi">0</span> <span class="mi">7</span> <span class="mi">8</span>   <span class="mi">0</span> <span class="mi">6</span> <span class="mi">1</span>   <span class="mi">0</span> <span class="mi">3</span> <span class="mi">0</span>
+<span class="mi">5</span> <span class="mi">0</span> <span class="mi">9</span>   <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span>   <span class="mi">4</span> <span class="mi">0</span> <span class="mi">6</span>
+<span class="mi">0</span> <span class="mi">2</span> <span class="mi">0</span>   <span class="mi">5</span> <span class="mi">4</span> <span class="mi">0</span>   <span class="mi">8</span> <span class="mi">9</span> <span class="mi">0</span>
+
+<span class="mi">0</span> <span class="mi">0</span> <span class="mi">7</span>   <span class="mi">4</span> <span class="mi">1</span> <span class="mi">0</span>   <span class="mi">9</span> <span class="mi">2</span> <span class="mi">0</span>
+<span class="mi">1</span> <span class="mi">0</span> <span class="mi">5</span>   <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span>   <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span>
+<span class="mi">8</span> <span class="mi">4</span> <span class="mi">0</span>   <span class="mi">6</span> <span class="mi">0</span> <span class="mi">0</span>   <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<dl class="py function">
+<dt id="sudoku.puzzle_from_sdm">
+<span id="4_sudoku.puzzle_from_sdm"></span><code class="sig-prename descclassname">4_sudoku.</code><code class="sig-name descname">puzzle_from_sdm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sdm_file</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span> &#x2192; Generator<span class="p">[</span>str<span class="p">, </span>None<span class="p">, </span>None<span class="p">]</span><a class="reference internal" href="_modules/4_sudoku.html#puzzle_from_sdm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sudoku.puzzle_from_sdm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the puzzles from a file in <code class="docutils literal notranslate"><span class="pre">.sdm</span></code> format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>sdm_file</strong> (<em>pathlib.Path</em>) – file with Sudoku puzzles.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>generator holding the string of a puzzle.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>typing.Generator[str, None, None]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sudoku.sdm_to_array">
+<span id="4_sudoku.sdm_to_array"></span><code class="sig-prename descclassname">4_sudoku.</code><code class="sig-name descname">sdm_to_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sdm_string</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; numpy.ndarray<a class="reference internal" href="_modules/4_sudoku.html#sdm_to_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sudoku.sdm_to_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse the sdm string to a Numpy ndarray, assuming a 9x9 puzzle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>sdm_string</strong> (<em>str</em>) – sdm string with the puzzle.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>puzzle converted to Numpy ndarray.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sudoku.solve_puzzle">
+<span id="4_sudoku.solve_puzzle"></span><code class="sig-prename descclassname">4_sudoku.</code><code class="sig-name descname">solve_puzzle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sudoku_puzzle</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>numpy.ndarray<span class="p">]</span><a class="reference internal" href="_modules/4_sudoku.html#solve_puzzle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sudoku.solve_puzzle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursive function to solve te Sudoku.</p>
+<p>For each cell, search all the digits which could fit in it.
+When a cell has a unique valid digit,
+update the puzzle with that digit and recall this function.</p>
+<p>If no cell with a single digit is found across the whole Sudoku,
+look for a unique digit among all the valid ones in each row,
+column or region.</p>
+<p>If no other digit is found,
+the puzzle may have multiple solutions and recursion stops.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>sudoku_puzzle</strong> (<em>np.ndarray</em>) – puzzle data.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the puzzle updated with new digits until a solution is
+found or <code class="docutils literal notranslate"><span class="pre">None</span></code> when multiple solutions are possible.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>typing.Optional[np.ndarray]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="README.html">README: problems solved in Python 🐍</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1_integer_sum.html">1_integer_sum module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2_caesar.html">2_caesar module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3_logparse.html">3_logparse module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">4_sudoku module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sudoku-solver">Sudoku Solver</a></li>
+</ul>
+</li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Search</h3>
+            <form class="search" action="search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="Go" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="3_logparse.html" title="3_logparse module"
+              >previous</a> |
+            <a href="py-modindex.html" title="Python Module Index"
+              >modules</a> |
+            <a href="genindex.html" title="General Index"
+              >index</a>
+          </div>
+          <div role="note" aria-label="source link">
+              <br/>
+              <a href="_sources/4_sudoku.rst.txt"
+                rel="nofollow">Show Source</a>
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Robin-Castellani.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

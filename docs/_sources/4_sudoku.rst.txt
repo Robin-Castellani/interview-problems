@@ -1,0 +1,7 @@
+4\_sudoku module
+================
+
+.. automodule:: 4_sudoku
+   :members:
+   :undoc-members:
+   :show-inheritance:

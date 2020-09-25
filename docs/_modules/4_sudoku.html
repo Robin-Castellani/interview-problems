@@ -1,0 +1,361 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4_sudoku &#8212; interview-problems  documentation</title>
+    <link rel="stylesheet" href="../_static/agogo.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../index.html">interview-problems  documentation</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for 4_sudoku</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sudoku Solver</span>
+<span class="sd">=============</span>
+
+<span class="sd">.. note::</span>
+
+<span class="sd">  A description of the sudoku puzzle can be found at:</span>
+<span class="sd">  `&lt;https://en.wikipedia.org/wiki/Sudoku&gt;`_.</span>
+
+<span class="sd">Given a string in ``SDM`` format, described below,</span>
+<span class="sd">write a program to find and return the solution for the sudoku puzzle</span>
+<span class="sd">in the string.</span>
+<span class="sd">The solution should be returned in the same ``SDM`` format as the input.</span>
+
+<span class="sd">Some puzzles will not be solvable.</span>
+<span class="sd">In that case, return the string ``&quot;Unsolvable&quot;``.</span>
+
+<span class="sd">The general ``SDM`` format is described here:</span>
+<span class="sd">`&lt;http://www.sudocue.net/fileformats.php&gt;`_.</span>
+
+<span class="sd">For our purposes, each ``SDM`` string will be a sequence of 81 digits,</span>
+<span class="sd">one for each position on the sudoku puzzle.</span>
+<span class="sd">Known numbers will be given, and unknown positions will have a zero value.</span>
+
+<span class="sd">For example, assume you&#39;re given this string of digits:</span>
+
+<span class="sd">::</span>
+
+<span class="sd">  004006079000000602056092300078061030509000406020540890007410920105000000840600100</span>
+
+<span class="sd">The string represents this starting sudoku puzzle:</span>
+
+<span class="sd">::</span>
+
+<span class="sd">  0 0 4   0 0 6   0 7 9</span>
+<span class="sd">  0 0 0   0 0 0   6 0 2</span>
+<span class="sd">  0 5 6   0 9 2   3 0 0</span>
+
+<span class="sd">  0 7 8   0 6 1   0 3 0</span>
+<span class="sd">  5 0 9   0 0 0   4 0 6</span>
+<span class="sd">  0 2 0   5 4 0   8 9 0</span>
+
+<span class="sd">  0 0 7   4 1 0   9 2 0</span>
+<span class="sd">  1 0 5   0 0 0   0 0 0</span>
+<span class="sd">  8 4 0   6 0 0   1 0 0</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sudoku</span> <span class="kn">import</span> <span class="n">sudoku</span>
+
+<span class="c1"># TODO: pretty print the sudoku</span>
+<span class="c1"># TODO: create a Sudoku class with read and write and solve methods</span>
+
+
+<div class="viewcode-block" id="puzzle_from_sdm"><a class="viewcode-back" href="../4_sudoku.html#4_sudoku.puzzle_from_sdm">[docs]</a><span class="k">def</span> <span class="nf">puzzle_from_sdm</span><span class="p">(</span>
+        <span class="n">sdm_file</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Generator</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read the puzzles from a file in ``.sdm`` format.</span>
+
+<span class="sd">    :param sdm_file: file with Sudoku puzzles.</span>
+<span class="sd">    :type sdm_file: pathlib.Path</span>
+<span class="sd">    :return: generator holding the string of a puzzle.</span>
+<span class="sd">    :rtype: typing.Generator[str, None, None]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">sdm_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">sdm</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">sdm</span> <span class="o">=</span> <span class="n">sdm</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">sdm</span><span class="p">)</span> <span class="o">==</span> <span class="mi">81</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Puzzle at line </span><span class="si">{</span><span class="n">l</span><span class="si">}</span><span class="s1"> is not valid&#39;</span>
+            <span class="k">yield</span> <span class="n">sdm</span></div>
+
+
+<div class="viewcode-block" id="sdm_to_array"><a class="viewcode-back" href="../4_sudoku.html#4_sudoku.sdm_to_array">[docs]</a><span class="k">def</span> <span class="nf">sdm_to_array</span><span class="p">(</span><span class="n">sdm_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse the sdm string to a Numpy ndarray, assuming a 9x9 puzzle.</span>
+
+<span class="sd">    :param sdm_string: sdm string with the puzzle.</span>
+<span class="sd">    :type sdm_string: str</span>
+<span class="sd">    :return: puzzle converted to Numpy ndarray.</span>
+<span class="sd">    :rtype: np.ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">sdm</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">number</span><span class="p">)</span> <span class="k">for</span> <span class="n">number</span> <span class="ow">in</span> <span class="n">sdm_string</span><span class="p">[</span><span class="n">row_n</span> <span class="o">-</span> <span class="mi">9</span><span class="p">:</span><span class="n">row_n</span><span class="p">]]</span>
+        <span class="k">for</span> <span class="n">row_n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sdm</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="solve_puzzle"><a class="viewcode-back" href="../4_sudoku.html#4_sudoku.solve_puzzle">[docs]</a><span class="k">def</span> <span class="nf">solve_puzzle</span><span class="p">(</span><span class="n">sudoku_puzzle</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Recursive function to solve te Sudoku.</span>
+
+<span class="sd">    For each cell, search all the digits which could fit in it.</span>
+<span class="sd">    When a cell has a unique valid digit,</span>
+<span class="sd">    update the puzzle with that digit and recall this function.</span>
+
+<span class="sd">    If no cell with a single digit is found across the whole Sudoku,</span>
+<span class="sd">    look for a unique digit among all the valid ones in each row,</span>
+<span class="sd">    column or region.</span>
+
+<span class="sd">    If no other digit is found,</span>
+<span class="sd">    the puzzle may have multiple solutions and recursion stops.</span>
+
+<span class="sd">    :param sudoku_puzzle: puzzle data.</span>
+<span class="sd">    :type sudoku_puzzle: np.ndarray</span>
+<span class="sd">    :return: the puzzle updated with new digits until a solution is</span>
+<span class="sd">        found or ``None`` when multiple solutions are possible.</span>
+<span class="sd">    :rtype: typing.Optional[np.ndarray]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># has the puzzle already been solved?</span>
+    <span class="k">if</span> <span class="mi">0</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sudoku_puzzle</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">sudoku_puzzle</span>
+
+    <span class="c1"># list of lists to store the valid digits in each cell</span>
+    <span class="n">valid_digits</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">[</span>
+            <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">row_n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">col_n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="c1"># cycle over the cells</span>
+    <span class="k">for</span> <span class="n">row_n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">col_n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">):</span>
+            <span class="c1"># skip the non-void cells</span>
+            <span class="k">if</span> <span class="n">sudoku_puzzle</span><span class="p">[</span><span class="n">row_n</span><span class="p">,</span> <span class="n">col_n</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># define the 3x3 region where the current cell is located</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="nb">slice</span><span class="p">(</span><span class="n">row_n</span> <span class="o">//</span> <span class="mi">3</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="n">row_n</span> <span class="o">//</span> <span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span><span class="p">),</span>
+                <span class="nb">slice</span><span class="p">(</span><span class="n">col_n</span> <span class="o">//</span> <span class="mi">3</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="n">col_n</span> <span class="o">//</span> <span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="c1"># check which digit could fit in the current cell</span>
+            <span class="c1"># -&gt; the digit is not in the row or column or region</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span><span class="p">(</span>
+                        <span class="n">n</span> <span class="ow">in</span> <span class="n">sudoku_puzzle</span><span class="p">[</span><span class="n">row_n</span><span class="p">,</span> <span class="p">:]</span> <span class="ow">or</span>
+                        <span class="n">n</span> <span class="ow">in</span> <span class="n">sudoku_puzzle</span><span class="p">[:,</span> <span class="n">col_n</span><span class="p">]</span> <span class="ow">or</span>
+                        <span class="n">n</span> <span class="ow">in</span> <span class="n">sudoku_puzzle</span><span class="p">[</span><span class="n">region</span><span class="p">]</span>
+                <span class="p">):</span>
+                    <span class="n">valid_digits</span><span class="p">[</span><span class="n">row_n</span><span class="p">][</span><span class="n">col_n</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+            <span class="c1"># does a single digit fit in the current cell?</span>
+            <span class="c1"># update the puzzle and start the algorithm from scratch</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_digits</span><span class="p">[</span><span class="n">row_n</span><span class="p">][</span><span class="n">col_n</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">sudoku_puzzle</span><span class="p">[</span><span class="n">row_n</span><span class="p">,</span> <span class="n">col_n</span><span class="p">]</span> <span class="o">=</span> <span class="n">valid_digits</span><span class="p">[</span><span class="n">row_n</span><span class="p">][</span><span class="n">col_n</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+                <span class="k">return</span> <span class="n">solve_puzzle</span><span class="p">(</span><span class="n">sudoku_puzzle</span><span class="p">)</span>
+
+    <span class="c1"># multiple digits fit in each void cell?</span>
+    <span class="c1"># check all the valid digits looking for a unique valid digit</span>
+    <span class="c1"># in a row, column or region</span>
+    <span class="c1"># if it is found, start the algorithm from scratch</span>
+    <span class="n">valid_digits_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">valid_digits</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">)</span>
+
+    <span class="c1"># check for single valid digits in rows</span>
+    <span class="k">for</span> <span class="n">row_n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">):</span>
+        <span class="n">digits_to_check</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span>
+                <span class="n">valid_digits_array</span><span class="p">[</span><span class="n">row_n</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">digit</span> <span class="ow">in</span> <span class="n">digits_to_check</span><span class="p">:</span>
+            <span class="n">digit_presence</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">digit</span> <span class="ow">in</span> <span class="n">lst</span>
+                <span class="k">for</span> <span class="n">lst</span> <span class="ow">in</span> <span class="n">valid_digits_array</span><span class="p">[</span><span class="n">row_n</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="p">]</span>
+            <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">digit_presence</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="n">digit_presence</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">sudoku_puzzle</span><span class="p">[</span><span class="n">row_n</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">digit</span>
+                <span class="k">return</span> <span class="n">solve_puzzle</span><span class="p">(</span><span class="n">sudoku_puzzle</span><span class="p">)</span>
+
+    <span class="c1"># check for single valid digits in columns</span>
+    <span class="k">for</span> <span class="n">col_n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">):</span>
+        <span class="n">digits_to_check</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span>
+                <span class="n">valid_digits_array</span><span class="p">[:,</span> <span class="n">col_n</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">digit</span> <span class="ow">in</span> <span class="n">digits_to_check</span><span class="p">:</span>
+            <span class="n">digit_presence</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">digit</span> <span class="ow">in</span> <span class="n">lst</span>
+                <span class="k">for</span> <span class="n">lst</span> <span class="ow">in</span> <span class="n">valid_digits_array</span><span class="p">[:,</span> <span class="n">col_n</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="p">]</span>
+            <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">digit_presence</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="n">digit_presence</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">sudoku_puzzle</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">col_n</span><span class="p">]</span> <span class="o">=</span> <span class="n">digit</span>
+                <span class="k">return</span> <span class="n">solve_puzzle</span><span class="p">(</span><span class="n">sudoku_puzzle</span><span class="p">)</span>
+
+    <span class="c1"># create regions and check for single valid digits among them</span>
+    <span class="n">regions</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span>
+            <span class="nb">slice</span><span class="p">(</span><span class="n">row_n</span> <span class="o">//</span> <span class="mi">3</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="n">row_n</span> <span class="o">//</span> <span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span><span class="p">),</span>
+            <span class="nb">slice</span><span class="p">(</span><span class="n">col_n</span> <span class="o">//</span> <span class="mi">3</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="n">col_n</span> <span class="o">//</span> <span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">row_n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">col_n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">regions</span><span class="p">:</span>
+        <span class="n">digits_to_check</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span>
+                <span class="n">valid_digits_array</span><span class="p">[</span><span class="n">region</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">digit</span> <span class="ow">in</span> <span class="n">digits_to_check</span><span class="p">:</span>
+            <span class="n">digit_presence</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">digit</span> <span class="ow">in</span> <span class="n">lst</span>
+                <span class="k">for</span> <span class="n">lst</span> <span class="ow">in</span> <span class="n">valid_digits_array</span><span class="p">[</span><span class="n">region</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="p">]</span>
+            <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">digit_presence</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># with regions, the idx is the progressive position</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="n">digit_presence</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="c1"># convert idx to row and column number</span>
+                <span class="n">target_row</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">//</span> <span class="mi">3</span> <span class="o">+</span> <span class="n">region</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">start</span>
+                <span class="n">target_col</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">+</span> <span class="n">region</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">start</span>
+                <span class="n">sudoku_puzzle</span><span class="p">[</span><span class="n">target_row</span><span class="p">,</span> <span class="n">target_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">digit</span>
+                <span class="k">return</span> <span class="n">solve_puzzle</span><span class="p">(</span><span class="n">sudoku_puzzle</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c1"># read the sdm file</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">raw_puzzle</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+            <span class="n">puzzle_from_sdm</span><span class="p">(</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s1">&#39;./sudoku_puzzles.sdm&#39;</span><span class="p">)),</span> <span class="mi">1</span>
+    <span class="p">):</span>
+        <span class="c1"># convert string to array</span>
+        <span class="n">puzzle</span> <span class="o">=</span> <span class="n">sdm_to_array</span><span class="p">(</span><span class="n">raw_puzzle</span><span class="p">)</span>
+        <span class="c1"># instantiate the same puzzle with the sudoku library (py-sudoku)</span>
+        <span class="c1"># to check my result against it</span>
+        <span class="n">comparison_puzzle</span> <span class="o">=</span> <span class="n">sudoku</span><span class="o">.</span><span class="n">Sudoku</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">board</span><span class="o">=</span><span class="n">puzzle</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+        <span class="c1"># solve the puzzle timing it</span>
+        <span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="n">solution</span> <span class="o">=</span> <span class="n">solve_puzzle</span><span class="p">(</span><span class="n">puzzle</span><span class="p">)</span>
+        <span class="n">toc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+
+        <span class="c1"># report the result</span>
+        <span class="k">if</span> <span class="n">solution</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Puzzle </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">: I found no solution, &quot;Unsolvable&quot;&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">comparison_puzzle</span><span class="o">.</span><span class="n">solve</span><span class="p">())</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=&#39;</span> <span class="o">*</span> <span class="mi">30</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># check my result with the comparison one</span>
+            <span class="k">assert</span> <span class="n">solution</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">==</span> <span class="n">comparison_puzzle</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span><span class="o">.</span><span class="n">board</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Puzzle </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">: solved in </span><span class="si">{</span><span class="n">toc</span> <span class="o">-</span> <span class="n">tic</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">s, the solution is&#39;</span><span class="p">,</span>
+                <span class="n">solution</span><span class="p">,</span>
+                <span class="s1">&#39;=&#39;</span> <span class="o">*</span> <span class="mi">30</span><span class="p">,</span>
+                <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="p">)</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">README: problems solved in Python 🐍</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../1_integer_sum.html">1_integer_sum module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../2_caesar.html">2_caesar module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3_logparse.html">3_logparse module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../4_sudoku.html">4_sudoku module</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Search</h3>
+            <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="Go" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="../py-modindex.html" title="Python Module Index"
+              >modules</a> |
+            <a href="../genindex.html" title="General Index"
+              >index</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Robin-Castellani.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>
